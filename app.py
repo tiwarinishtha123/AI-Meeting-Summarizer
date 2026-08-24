@@ -1,15 +1,19 @@
+import os
+
 from fastapi import FastAPI, UploadFile, File
-from google.colab import userdata
 from google import genai
 import whisper
-import os
 
 
 # =========================
 # Gemini Configuration
 # =========================
 
-api_key = userdata.get("GEMINI_API_KEY")
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable is not set.")
+
 client = genai.Client(api_key=api_key)
 
 
@@ -91,7 +95,7 @@ Transcript:
 @app.post("/upload-audio")
 async def upload_audio(file: UploadFile = File(...)):
 
-    audio_path = "/content/" + file.filename
+    audio_path = "/tmp/" + file.filename
 
     # Save uploaded audio
     with open(audio_path, "wb") as f:
